@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Params::Validate::Dependencies qw(:_of);
+use Scalar::Util qw(blessed);
 
 use base qw(Data::Domain);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
-$VERSION = '1.00';
+$VERSION = '1.1';
 
 @EXPORT = ();
 @EXPORT_OK = (@{$Params::Validate::Dependencies::EXPORT_TAGS{_of}}, 'Dependencies');
@@ -20,12 +21,13 @@ Data::Domain::Dependencies
 
 =head1 DESCRIPTION
 
-Provides functions and objects to let Data::Domain use the same
-functions as Params::Validate.
+A sub-class of Data::Domain which provides functions and objects
+to let Data::Domain use the same
+functions as Params::Validate::Dependencies.
 
 =head1 SYNOPSIS
 
-This creates a domain which, when passed a hashref, to inspect, will
+This creates a domain which, when passed a hashref to inspect, will
 check that it contains at least one of an 'alpha' or 'beta' key, or
 both of 'foo' and 'bar'.
 
@@ -48,13 +50,11 @@ function.  They are all available under the 'all' tag.
 
 =head2 Dependencies
 
-This takes a code-ref argument.  That code-ref should take a hash-ref
-as its argument and return true if the hash-ref passes validation,
-false otherwise.
+This takes a code-ref argument as returned by the *_of functions.
 
-'Dependencies' will return an object wrapped around that code-ref
-whoise 'inspect' method will, if the code-ref returns true, return
-nothing, or if false, return an error.
+It returns an object which is a sub-class of Data::Domain::Dependencies
+and so has an 'inspect' method that you can use to check for errors
+when passing it a hash-ref.
 
 =cut
 
@@ -66,17 +66,44 @@ sub Dependencies {
 =head2 new
 
 'Dependencies' above is really just a thin wrapper around this
-constructor, which simply takes a code-ref argument.  You are
+constructor.  You are
 encouraged to not call this directly.
 
 =cut
 
-# yeah, blessing a code-ref.  Have at you, easy debugging!
 sub new {
   my($class, $sub) = @_;
-  die("$class constructor must be passed a code-ref\n")
-    unless(ref($sub) =~ /CODE/i);
-  bless $sub, $class;
+  die("$class constructor must be passed a Params::Validate::Dependencies object or a code-ref\n")
+    unless(ref($sub) =~ /CODE/ || (blessed($sub) && $sub->isa('Params::Validate::Dependencies::Documenter')));
+  if(blessed($sub)) {
+    my $target_class = "${class}::".$sub->name();
+    unless(UNIVERSAL::can($target_class, 'can')) {
+      no strict 'refs';
+      # multiple inheritance so we can get at Data::Domain->inspect()
+      # and Params::Validate::Dependencies::Documenter->_document()
+      @{"${target_class}::ISA"} = (
+        'Data::Domain::Dependencies',
+        blessed($sub)
+      );
+    }
+    return bless sub { $sub->(@_) }, $target_class;
+  } else {
+    return bless sub { $sub->(@_) }, $class;
+  }
+}
+
+=head2 generate_documentation
+
+This is an additional method, not found in Data::Domain, which
+generates vaguely readable
+documentation for the domain.  Broadly speaking, it spits out the
+source code.
+
+=cut
+
+sub generate_documentation {
+  my $self = shift;
+  $self->_document();
 }
 
 # this is where the magic happens ...
@@ -88,6 +115,11 @@ sub _inspect {
 
   return $sub->($data) ? () : __PACKAGE__.": validation failed";
 }
+
+=head1 LIES
+
+Some of the above is incorrect.  If you really want to know what's
+going on, look at L<Params::Validate::Dependencies::Extending>.
 
 =head1 BUGS, LIMITATIONS, and FEEDBACK
 

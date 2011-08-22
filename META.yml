@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Params-Validate-Dependencies
-version:            1.00
+version:            1.1
 abstract:           ~
 author:  []
 license:            unknown
@@ -11,7 +11,9 @@ build_requires:
     ExtUtils::MakeMaker:  0
 requires:
     Data::Domain:      0.14
-    Params::Validate:  1
+    PadWalker:         1.9
+    Params::Validate:  0.95
+    Scalar::Util:      0
 no_index:
     directory:
         - t
