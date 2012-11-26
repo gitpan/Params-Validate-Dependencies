@@ -1,24 +1,28 @@
---- #YAML:1.0
-name:               Params-Validate-Dependencies
-version:            1.12
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: unknown
+author:
+  - unknown
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Data::Domain:      0.13
-    PadWalker:         1.9
-    Params::Validate:  0.91
-    Scalar::Util:      0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.50
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-Validate-Dependencies
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Domain: 1.02
+  PadWalker: 1.96
+  Params::Validate: 1.07
+  Scalar::Util: 1.25
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues
+  repository: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies
+version: 1.13
