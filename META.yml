@@ -25,4 +25,4 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues
   repository: https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies
-version: 1.13
+version: 1.2
